@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Widget</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/weather-icons@2.0.12/css/weather-icons.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400&family=DM+Sans:wght@300;400&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background: transparent; display: flex; align-items: center; justify-content: center; min-height: 100vh; font-family: 'DM Sans', sans-serif; }
+    .wrapper { display: flex; align-items: center; }
+    .block { text-align: center; padding: 2rem 3rem; }
+    .clock { border-left: 2px solid #e0e0e0; }
+    .weather { border-right: 2px solid #e0e0e0; }
+    .label { font-size: 0.72rem; color: #aaa; letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 0.5rem; }
+    .main-value { font-family: 'DM Mono', monospace; font-size: 3rem; font-weight: 300; color: #111; letter-spacing: 0.05em; line-height: 1; }
+    .main-value .muted { font-size: 1.6rem; color: #aaa; vertical-align: baseline; margin-left: 2px; }
+    .divider { width: 32px; height: 1px; background: #e0e0e0; margin: 0.75rem auto; }
+    .detail { font-size: 0.85rem; color: #555; letter-spacing: 0.08em; text-transform: uppercase; }
+    .subdetail { font-size: 0.72rem; color: #aaa; letter-spacing: 0.08em; margin-top: 0.25rem; }
+    .wi { font-size: 2rem; margin-bottom: 0.25rem; display: block; }
+  </style>
+</head>
+<body>
+  <div class="wrapper">
+    <div class="block clock">
+      <div class="main-value">
+        <span id="hm">--:--</span><span class="muted" id="sec">--</span>
+      </div>
+      <div class="divider"></div>
+      <div class="detail" id="date">-- de --- de ----</div>
+      <div class="subdetail" id="weekday">-------</div>
+    </div>
+
+    <div class="block weather">
+      <div class="label">Braga</div>
+      <div class="main-value">
+        <span id="temp">--</span><span class="muted">°C</span>
+      </div>
+      <div class="divider"></div>
+      <i id="wx-icon" class="wi wi-day-sunny" style="color:#f5a623;"></i>
+      <div class="subdetail" id="minmax">-- / --</div>
+    </div>
+  </div>
+
+  <script>
+    const months = ['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
+    const days = ['domingo','segunda-feira','terça-feira','quarta-feira','quinta-feira','sexta-feira','sábado'];
+
+    function pad(n) { return String(n).padStart(2, '0'); }
+
+    function tick() {
+      const now = new Date();
+      document.getElementById('hm').textContent = pad(now.getHours()) + ':' + pad(now.getMinutes());
+      document.getElementById('sec').textContent = pad(now.getSeconds());
+      document.getElementById('date').textContent = now.getDate() + ' de ' + months[now.getMonth()] + ' de ' + now.getFullYear();
+      document.getElementById('weekday').textContent = days[now.getDay()];
+    }
+    tick();
+    setInterval(tick, 1000);
+
+    const wxMap = {
+      0:  { icon: 'wi-day-sunny',          color: '#f5a623' },
+      1:  { icon: 'wi-day-sunny-overcast',  color: '#f5a623' },
+      2:  { icon: 'wi-day-cloudy',          color: '#8ea8c3' },
+      3:  { icon: 'wi-cloudy',              color: '#7a8fa6' },
+      45: { icon: 'wi-fog',                 color: '#a0aab4' },
+      48: { icon: 'wi-fog',                 color: '#a0aab4' },
+      51: { icon: 'wi-sprinkle',            color: '#5b9bd5' },
+      53: { icon: 'wi-sprinkle',            color: '#5b9bd5' },
+      55: { icon: 'wi-rain',                color: '#3a78b5' },
+      61: { icon: 'wi-rain',                color: '#5b9bd5' },
+      63: { icon: 'wi-rain',                color: '#3a78b5' },
+      65: { icon: 'wi-rain',                color: '#1a5a9a' },
+      71: { icon: 'wi-snow',                color: '#a8d4f5' },
+      73: { icon: 'wi-snow',                color: '#7abfe8' },
+      75: { icon: 'wi-snow',                color: '#4fa3d8' },
+      80: { icon: 'wi-showers',             color: '#5b9bd5' },
+      81: { icon: 'wi-showers',             color: '#3a78b5' },
+      82: { icon: 'wi-storm-showers',       color: '#1a5a9a' },
+      95: { icon: 'wi-thunderstorm',        color: '#5a4a7a' },
+      99: { icon: 'wi-hail',                color: '#4a3a6a' },
+    };
+
+    fetch('https://api.open-meteo.com/v1/forecast?latitude=41.55&longitude=-8.43&current=temperature_2m,weathercode&daily=temperature_2m_max,temperature_2m_min&timezone=Europe%2FLisbon&forecast_days=1')
+      .then(r => r.json())
+      .then(d => {
+        const code = d.current.weathercode;
+        const wx = wxMap[code] || { icon: 'wi-cloud', color: '#7a8fa6' };
+        document.getElementById('temp').textContent = Math.round(d.current.temperature_2m);
+        const el = document.getElementById('wx-icon');
+        el.className = 'wi ' + wx.icon;
+        el.style.color = wx.color;
+        document.getElementById('minmax').textContent = 'máx ' + Math.round(d.daily.temperature_2m_max[0]) + '°  mín ' + Math.round(d.daily.temperature_2m_min[0]) + '°';
+      })
+      .catch(() => {
+        document.getElementById('wx-icon').className = 'wi wi-na';
+      });
+  </script>
+</body>
+</html>
