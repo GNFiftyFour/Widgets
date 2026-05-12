@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Relógio</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400&family=DM+Sans:wght@300;400&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: transparent;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      font-family: 'DM Sans', sans-serif;
+    }
+
+    .widget {
+      text-align: center;
+      padding: 2rem 3rem;
+      border-left: 2px solid #e0e0e0;
+      display: inline-block;
+    }
+
+    .time {
+      font-family: 'DM Mono', monospace;
+      font-size: 3rem;
+      font-weight: 300;
+      color: #111;
+      letter-spacing: 0.05em;
+      line-height: 1;
+    }
+
+    .time .seconds {
+      font-size: 1.6rem;
+      color: #aaa;
+      vertical-align: baseline;
+      margin-left: 2px;
+    }
+
+    .divider {
+      width: 32px;
+      height: 1px;
+      background: #e0e0e0;
+      margin: 0.75rem auto;
+    }
+
+    .date {
+      font-size: 0.85rem;
+      font-weight: 400;
+      color: #555;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .weekday {
+      font-size: 0.72rem;
+      font-weight: 300;
+      color: #aaa;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      margin-top: 0.25rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="widget">
+    <div class="time">
+      <span id="hm">--:--</span><span class="seconds" id="sec">--</span>
+    </div>
+    <div class="divider"></div>
+    <div class="date" id="date">-- de --- de ----</div>
+    <div class="weekday" id="weekday">-------</div>
+  </div>
+
+  <script>
+    const months = ['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
+    const days = ['domingo','segunda-feira','terça-feira','quarta-feira','quinta-feira','sexta-feira','sábado'];
+
+    function pad(n) { return String(n).padStart(2, '0'); }
+
+    function tick() {
+      const now = new Date();
+      document.getElementById('hm').textContent = pad(now.getHours()) + ':' + pad(now.getMinutes());
+      document.getElementById('sec').textContent = pad(now.getSeconds());
+      document.getElementById('date').textContent = now.getDate() + ' de ' + months[now.getMonth()] + ' de ' + now.getFullYear();
+      document.getElementById('weekday').textContent = days[now.getDay()];
+    }
+
+    tick();
+    setInterval(tick, 1000);
+  </script>
+</body>
+</html>
