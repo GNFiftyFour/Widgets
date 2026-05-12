@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tempo</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400&family=DM+Sans:wght@300;400&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background: transparent; display: flex; align-items: center; justify-content: center; min-height: 100vh; font-family: 'DM Sans', sans-serif; }
+    .widget { text-align: center; padding: 2rem 3rem; border-left: 2px solid #e0e0e0; display: inline-block; }
+    .location { font-size: 0.72rem; font-weight: 400; color: #aaa; letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 0.5rem; }
+    .temp { font-family: 'DM Mono', monospace; font-size: 3rem; font-weight: 300; color: #111; letter-spacing: 0.05em; line-height: 1; }
+    .temp .unit { font-size: 1.6rem; color: #aaa; vertical-align: baseline; margin-left: 2px; }
+    .divider { width: 32px; height: 1px; background: #e0e0e0; margin: 0.75rem auto; }
+    .condition { font-size: 0.85rem; font-weight: 400; color: #555; letter-spacing: 0.08em; text-transform: uppercase; }
+    .minmax { font-size: 0.72rem; font-weight: 300; color: #aaa; letter-spacing: 0.08em; margin-top: 0.25rem; }
+  </style>
+</head>
+<body>
+  <div class="widget">
+    <div class="location">Braga</div>
+    <div class="temp"><span id="temp">--</span><span class="unit">°C</span></div>
+    <div class="divider"></div>
+    <div class="condition" id="condition">--</div>
+    <div class="minmax" id="minmax">-- / --</div>
+  </div>
+
+  <script>
+    const conditions = {
+      0:'céu limpo', 1:'quase limpo', 2:'parcialmente nublado', 3:'nublado',
+      45:'nevoeiro', 48:'nevoeiro gelado', 51:'chuvisco leve', 53:'chuvisco', 55:'chuvisco forte',
+      61:'chuva leve', 63:'chuva', 65:'chuva forte', 71:'neve leve', 73:'neve', 75:'neve forte',
+      80:'aguaceiros', 81:'aguaceiros', 82:'aguaceiros fortes', 95:'trovoada', 99:'trovoada com granizo'
+    };
+
+    fetch('https://api.open-meteo.com/v1/forecast?latitude=41.55&longitude=-8.43&current=temperature_2m,weathercode&daily=temperature_2m_max,temperature_2m_min&timezone=Europe%2FLisbon&forecast_days=1')
+      .then(r => r.json())
+      .then(d => {
+        const t = Math.round(d.current.temperature_2m);
+        const code = d.current.weathercode;
+        const max = Math.round(d.daily.temperature_2m_max[0]);
+        const min = Math.round(d.daily.temperature_2m_min[0]);
+        document.getElementById('temp').textContent = t;
+        document.getElementById('condition').textContent = conditions[code] || 'variável';
+        document.getElementById('minmax').textContent = 'máx ' + max + '°  mín ' + min + '°';
+      })
+      .catch(() => {
+        document.getElementById('condition').textContent = 'sem dados';
+      });
+  </script>
+</body>
+</html>
