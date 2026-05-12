@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Widget</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background: transparent; display: flex; align-items: center; justify-content: center; min-height: 100vh; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
+    .wrapper { display: flex; align-items: stretch; }
+    .block { text-align: center; padding: 1.75rem 2.5rem; }
+    .clock { border-left: 2px solid #e0e0e0; }
+    .weather { border-right: 2px solid #e0e0e0; }
+    .sep { width: 1px; background: #e0e0e0; margin: 1.75rem 0; }
+    .label { font-size: 11px; color: #bbb; letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 0.5rem; }
+    .main-value { font-size: 3rem; font-weight: 200; color: #111; letter-spacing: 0.02em; line-height: 1; font-variant-numeric: tabular-nums; }
+    .main-value .muted { font-size: 1.5rem; color: #bbb; margin-left: 2px; }
+    .divider { width: 28px; height: 1px; background: #e8e8e8; margin: 0.7rem auto; }
+    .detail { font-size: 12px; color: #888; letter-spacing: 0.06em; text-transform: uppercase; }
+    .subdetail { font-size: 11px; color: #bbb; margin-top: 0.2rem; }
+    .wx-emoji { font-size: 1.8rem; line-height: 1; margin-bottom: 0.2rem; }
+  </style>
+</head>
+<body>
+  <div class="wrapper">
+    <div class="block clock">
+      <div class="main-value">
+        <span id="hm">--:--</span><span class="muted" id="sec">--</span>
+      </div>
+      <div class="divider"></div>
+      <div class="detail" id="date">-- de --- de ----</div>
+      <div class="subdetail" id="weekday">-------</div>
+    </div>
+
+    <div class="sep"></div>
+
+    <div class="block weather">
+      <div class="label">Braga</div>
+      <div class="main-value">
+        <span id="temp">--</span><span class="muted">°C</span>
+      </div>
+      <div class="divider"></div>
+      <div class="wx-emoji" id="wx-emoji">🌤</div>
+      <div class="subdetail" id="minmax">-- / --</div>
+    </div>
+  </div>
+
+  <script>
+    const months = ['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
+    const days = ['domingo','segunda-feira','terça-feira','quarta-feira','quinta-feira','sexta-feira','sábado'];
+
+    function pad(n) { return String(n).padStart(2,'0'); }
+
+    function tick() {
+      const n = new Date();
+      document.getElementById('hm').textContent = pad(n.getHours())+':'+pad(n.getMinutes());
+      document.getElementById('sec').textContent = pad(n.getSeconds());
+      document.getElementById('date').textContent = n.getDate()+' de '+months[n.getMonth()]+' de '+n.getFullYear();
+      document.getElementById('weekday').textContent = days[n.getDay()];
+    }
+    tick();
+    setInterval(tick, 1000);
+
+    const wxEmoji = {
+      0:'☀️', 1:'🌤', 2:'⛅', 3:'☁️',
+      45:'🌫', 48:'🌫',
+      51:'🌦', 53:'🌦', 55:'🌧',
+      61:'🌧', 63:'🌧', 65:'🌧',
+      71:'🌨', 73:'🌨', 75:'❄️',
+      80:'🌦', 81:'🌧', 82:'⛈',
+      95:'⛈', 99:'⛈'
+    };
+
+    fetch('https://api.open-meteo.com/v1/forecast?latitude=41.55&longitude=-8.43&current=temperature_2m,weathercode&daily=temperature_2m_max,temperature_2m_min&timezone=Europe%2FLisbon&forecast_days=1')
+      .then(r => r.json())
+      .then(d => {
+        document.getElementById('temp').textContent = Math.round(d.current.temperature_2m);
+        document.getElementById('wx-emoji').textContent = wxEmoji[d.current.weathercode] || '🌡';
+        document.getElementById('minmax').textContent = 'máx '+Math.round(d.daily.temperature_2m_max[0])+'°  mín '+Math.round(d.daily.temperature_2m_min[0])+'°';
+      })
+      .catch(() => { document.getElementById('wx-emoji').textContent = '—'; });
+  </script>
+</body>
+</html>
