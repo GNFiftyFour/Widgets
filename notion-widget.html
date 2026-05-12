@@ -8,17 +8,17 @@
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { background: transparent; display: flex; align-items: center; justify-content: center; min-height: 100vh; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
     .wrapper { display: flex; align-items: stretch; }
-    .block { text-align: center; padding: 1.75rem 2.5rem; }
+    .block { text-align: center; padding: 1.25rem 3rem; }
     .clock { border-left: 2px solid #e0e0e0; }
     .weather { border-right: 2px solid #e0e0e0; }
-    .sep { width: 1px; background: #e0e0e0; margin: 1.75rem 0; }
-    .label { font-size: 11px; color: #bbb; letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 0.5rem; }
-    .main-value { font-size: 3rem; font-weight: 200; color: #111; letter-spacing: 0.02em; line-height: 1; font-variant-numeric: tabular-nums; }
-    .main-value .muted { font-size: 1.5rem; color: #bbb; margin-left: 2px; }
-    .divider { width: 28px; height: 1px; background: #e8e8e8; margin: 0.7rem auto; }
-    .detail { font-size: 12px; color: #888; letter-spacing: 0.06em; text-transform: uppercase; }
-    .subdetail { font-size: 11px; color: #bbb; margin-top: 0.2rem; }
-    .wx-emoji { font-size: 1.8rem; line-height: 1; margin-bottom: 0.2rem; }
+    .sep { width: 1px; background: #e0e0e0; margin: 1.25rem 0; }
+    .label { font-size: 12px; color: #bbb; letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 0.4rem; }
+    .main-value { font-size: 3.5rem; font-weight: 200; color: #111; letter-spacing: 0.02em; line-height: 1; font-variant-numeric: tabular-nums; }
+    .main-value .muted { font-size: 1.8rem; color: #bbb; margin-left: 2px; }
+    .divider { width: 28px; height: 1px; background: #e8e8e8; margin: 0.5rem auto; }
+    .detail { font-size: 13px; color: #888; letter-spacing: 0.06em; text-transform: uppercase; }
+    .subdetail { font-size: 12px; color: #bbb; margin-top: 0.15rem; }
+    .wx-emoji { font-size: 2rem; line-height: 1; margin-bottom: 0.15rem; font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif; }
   </style>
 </head>
 <body>
@@ -40,7 +40,7 @@
         <span id="temp">--</span><span class="muted">°C</span>
       </div>
       <div class="divider"></div>
-      <div class="wx-emoji" id="wx-emoji">🌤</div>
+      <div class="wx-emoji" id="wx-emoji">🌤️</div>
       <div class="subdetail" id="minmax">-- / --</div>
     </div>
   </div>
@@ -62,20 +62,20 @@
     setInterval(tick, 1000);
 
     const wxEmoji = {
-      0:'☀️', 1:'🌤', 2:'⛅', 3:'☁️',
-      45:'🌫', 48:'🌫',
-      51:'🌦', 53:'🌦', 55:'🌧',
-      61:'🌧', 63:'🌧', 65:'🌧',
-      71:'🌨', 73:'🌨', 75:'❄️',
-      80:'🌦', 81:'🌧', 82:'⛈',
-      95:'⛈', 99:'⛈'
+      0:'☀️', 1:'🌤️', 2:'⛅', 3:'☁️',
+      45:'🌫️', 48:'🌫️',
+      51:'🌦️', 53:'🌦️', 55:'🌧️',
+      61:'🌧️', 63:'🌧️', 65:'🌧️',
+      71:'🌨️', 73:'🌨️', 75:'❄️',
+      80:'🌦️', 81:'🌧️', 82:'⛈️',
+      95:'⛈️', 99:'⛈️'
     };
 
     fetch('https://api.open-meteo.com/v1/forecast?latitude=41.55&longitude=-8.43&current=temperature_2m,weathercode&daily=temperature_2m_max,temperature_2m_min&timezone=Europe%2FLisbon&forecast_days=1')
       .then(r => r.json())
       .then(d => {
         document.getElementById('temp').textContent = Math.round(d.current.temperature_2m);
-        document.getElementById('wx-emoji').textContent = wxEmoji[d.current.weathercode] || '🌡';
+        document.getElementById('wx-emoji').textContent = wxEmoji[d.current.weathercode] || '🌡️';
         document.getElementById('minmax').textContent = 'máx '+Math.round(d.daily.temperature_2m_max[0])+'°  mín '+Math.round(d.daily.temperature_2m_min[0])+'°';
       })
       .catch(() => { document.getElementById('wx-emoji').textContent = '—'; });
